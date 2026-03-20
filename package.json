@@ -1,0 +1,83 @@
+{
+  "name": "yakubu-manage",
+  "displayName": "Yakubu Manage",
+  "description": "Play your Yakubu Manage sound when code diagnostics or terminal commands fail.",
+  "version": "0.0.1",
+  "publisher": "yakubu",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:yakubu-manage.play-test-sound",
+    "onCommand:yakubu-manage.toggle-mute"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "yakubu-manage.play-test-sound",
+        "title": "Yakubu Manage: Play Test Sound"
+      },
+      {
+        "command": "yakubu-manage.toggle-mute",
+        "title": "Yakubu Manage: Toggle Mute"
+      }
+    ],
+    "configuration": {
+      "title": "Yakubu Manage",
+      "properties": {
+        "yakubuManage.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable error-triggered sound playback."
+        },
+        "yakubuManage.triggerOnDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play sound when editor diagnostics introduce errors."
+        },
+        "yakubuManage.triggerOnTerminalFailures": {
+          "type": "boolean",
+          "default": true,
+          "description": "Play sound when terminal shell integration reports non-zero exits."
+        },
+        "yakubuManage.onlyOnNewDiagnosticErrors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Only play when diagnostic error count increases, not on every diagnostic refresh."
+        },
+        "yakubuManage.minIntervalMs": {
+          "type": "number",
+          "default": 10000,
+          "minimum": 0,
+          "description": "Minimum time between sound events to prevent noise storms."
+        },
+        "yakubuManage.customPlayCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Custom shell command to play a sound. If set, this command is used instead of built-in platform defaults."
+        },
+        "yakubuManage.customSoundPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional absolute path to a sound file for built-in platform commands."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "typecheck": "tsc --noEmit -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.5.4"
+  }
+}
