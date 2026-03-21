@@ -59,9 +59,13 @@ export class DiagnosticErrorDetector implements vscode.Disposable {
       return;
     }
 
+    const totalErrors = Array.from(this.knownErrorCountByDocument.values())
+      .reduce((sum, n) => sum + n, 0);
+
     const played = await this.controller.trigger({
       source: "diagnostic",
       message: "Diagnostics introduced an error.",
+      severity: totalErrors >= 10 ? "high" : "normal",
     });
 
     if (!played) {

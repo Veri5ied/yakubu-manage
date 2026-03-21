@@ -67,6 +67,7 @@ export class TerminalErrorDetector implements vscode.Disposable {
     const played = await this.controller.trigger({
       source: "terminal",
       message,
+      severity: "high",
     });
 
     if (!played) {

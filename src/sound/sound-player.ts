@@ -6,6 +6,8 @@ export interface SoundPlaybackConfig {
   customPlayCommand: string;
   customSoundPath: string;
   bundledSoundPath: string;
+  /** When set, overrides customSoundPath and bundledSoundPath. */
+  overrideSoundPath?: string;
 }
 
 export interface SoundPlayer {
@@ -25,10 +27,11 @@ export class ShellCommandSoundPlayer implements SoundPlayer {
       return;
     }
 
-    const playPlan = createDefaultPlayPlan(
-      process.platform,
-      config.customSoundPath || config.bundledSoundPath,
-    );
+    const soundPath =
+      config.overrideSoundPath ||
+      config.customSoundPath ||
+      config.bundledSoundPath;
+    const playPlan = createDefaultPlayPlan(process.platform, soundPath);
     let lastError: unknown;
 
     for (const step of playPlan) {
