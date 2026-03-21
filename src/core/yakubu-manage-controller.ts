@@ -16,6 +16,7 @@ interface YakubuManageControllerDependencies {
   logger: Logger;
   soundPlayer: SoundPlayer;
   bundledSoundPath: string;
+  ramiSoundPath: string;
 }
 
 interface PlayOptions {
@@ -71,6 +72,26 @@ export class YakubuManageController implements vscode.Disposable {
     this.configSubscription.dispose();
   }
 
+  private pickSoundPath(event: ErrorTriggerEvent): string | undefined {
+    // User-configured custom sound always takes priority.
+    if (this.config.customSoundPath) {
+      return undefined;
+    }
+
+    const useRami =
+      event.severity === "high" ||
+      event.source === "terminal";
+
+    if (useRami) {
+      return this.dependencies.ramiSoundPath;
+    }
+
+    // Normal severity: pick randomly between the two bundled tracks.
+    return Math.random() < 0.5
+      ? this.dependencies.bundledSoundPath
+      : this.dependencies.ramiSoundPath;
+  }
+
   private async play(
     event: ErrorTriggerEvent,
     options: PlayOptions,
@@ -98,10 +119,12 @@ export class YakubuManageController implements vscode.Disposable {
     }
 
     try {
+      const overrideSoundPath = this.pickSoundPath(event);
       await this.dependencies.soundPlayer.play({
         customPlayCommand: this.config.customPlayCommand,
         customSoundPath: this.config.customSoundPath,
         bundledSoundPath: this.dependencies.bundledSoundPath,
+        overrideSoundPath,
       });
       this.dependencies.logger.info(
         `Played sound for ${event.source}. ${event.message}`,

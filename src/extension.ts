@@ -20,12 +20,19 @@ export function activate(context: vscode.ExtensionContext): void {
     "yakubu-manage.mp3",
   ).fsPath;
 
+  const ramiSoundPath = vscode.Uri.joinPath(
+    context.extensionUri,
+    "assets",
+    "Rami lo wo.mp3",
+  ).fsPath;
+
   const controller = new YakubuManageController({
     context,
     configProvider,
     logger,
     soundPlayer,
     bundledSoundPath,
+    ramiSoundPath,
   });
 
   const diagnosticDetector = new DiagnosticErrorDetector(
