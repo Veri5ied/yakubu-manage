@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3
+
+- Added a packaged extension icon for VS Code and Marketplace builds.
+
 ## 0.0.2
 
 - Fixed Windows playback so the extension plays the bundled `assets/yakubu-manage.mp3` sound instead of falling back to a console beep.
