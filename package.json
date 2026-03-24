@@ -2,7 +2,7 @@
   "name": "yakubu-manage",
   "displayName": "Yakubu Manage",
   "description": "Play your Yakubu Manage sound when code diagnostics or terminal commands fail.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "yakubu",
   "license": "MIT",
   "engines": {

@@ -52,23 +52,79 @@ function createWindowsPlan(preferredSoundPath: string): ProcessCommand[] {
   const plan: ProcessCommand[] = [];
 
   if (preferredSoundPath) {
-    const escapedPath = preferredSoundPath.replace(/'/g, "''");
-    plan.push({
-      command: "powershell",
-      args: [
-        "-NoProfile",
-        "-Command",
-        `(New-Object Media.SoundPlayer '${escapedPath}').PlaySync()`,
-      ],
-    });
+    const escapedPath = escapePowerShellSingleQuotedString(preferredSoundPath);
+
+    if (preferredSoundPath.toLowerCase().endsWith(".wav")) {
+      plan.push(createWindowsSoundPlayerCommand(escapedPath));
+    }
+
+    plan.push(createWindowsPresentationCoreCommand(escapedPath));
+    plan.push(createWindowsMediaPlayerCommand(escapedPath));
   }
 
-  plan.push({
-    command: "powershell",
-    args: ["-NoProfile", "-Command", "[console]::beep(1100,250)"],
-  });
-
   return plan;
+}
+
+function createWindowsSoundPlayerCommand(escapedPath: string): ProcessCommand {
+  return {
+    command: "powershell",
+    args: [
+      "-NoProfile",
+      "-Command",
+      `(New-Object System.Media.SoundPlayer '${escapedPath}').PlaySync()`,
+    ],
+  };
+}
+
+function createWindowsPresentationCoreCommand(
+  escapedPath: string,
+): ProcessCommand {
+  return {
+    command: "powershell",
+    args: [
+      "-NoProfile",
+      "-STA",
+      "-Command",
+      [
+        "Add-Type -AssemblyName PresentationCore",
+        "$player = New-Object System.Windows.Media.MediaPlayer",
+        `$player.Open([Uri]::new('${escapedPath}'))`,
+        "$deadline = [DateTime]::UtcNow.AddSeconds(5)",
+        "while ((-not $player.NaturalDuration.HasTimeSpan) -and [DateTime]::UtcNow -lt $deadline) { Start-Sleep -Milliseconds 100 }",
+        "if (-not $player.NaturalDuration.HasTimeSpan) { $player.Close(); exit 1 }",
+        "$player.Play()",
+        "$playbackMs = [Math]::Max(1000, [Math]::Ceiling($player.NaturalDuration.TimeSpan.TotalMilliseconds) + 250)",
+        "Start-Sleep -Milliseconds $playbackMs",
+        "$player.Close()",
+      ].join("; "),
+    ],
+  };
+}
+
+function createWindowsMediaPlayerCommand(escapedPath: string): ProcessCommand {
+  return {
+    command: "powershell",
+    args: [
+      "-NoProfile",
+      "-Command",
+      [
+        "$player = New-Object -ComObject WMPlayer.OCX",
+        "$player.settings.autoStart = $false",
+        `$player.URL = '${escapedPath}'`,
+        "$player.controls.play()",
+        "$deadline = [DateTime]::UtcNow.AddSeconds(5)",
+        "while ((-not $player.currentMedia -or $player.currentMedia.duration -le 0) -and [DateTime]::UtcNow -lt $deadline) { Start-Sleep -Milliseconds 100 }",
+        "if (-not $player.currentMedia -or $player.currentMedia.duration -le 0) { $player.close(); exit 1 }",
+        "$playbackMs = [Math]::Max(1000, [Math]::Ceiling($player.currentMedia.duration * 1000) + 250)",
+        "Start-Sleep -Milliseconds $playbackMs",
+        "$player.close()",
+      ].join("; "),
+    ],
+  };
+}
+
+function escapePowerShellSingleQuotedString(value: string): string {
+  return value.replace(/'/g, "''");
 }
 
 function createLinuxPlan(preferredSoundPath: string): ProcessCommand[] {

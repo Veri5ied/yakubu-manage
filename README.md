@@ -16,6 +16,7 @@ It is intentionally configurable so it can stay useful instead of noisy.
 - Manual test command (`Yakubu Manage: Play Test Sound`)
 - Cross-platform default playback with optional custom command override
 - Bundled default sound asset at `assets/yakubu-manage.mp3`
+- Windows built-in playback for the bundled `assets/yakubu-manage.mp3` sound
 
 ## Configuration
 
@@ -31,6 +32,7 @@ Open VS Code settings and search for `Yakubu Manage`.
 
 By default, the extension plays the bundled `assets/yakubu-manage.mp3`.  
 If you set `yakubuManage.customSoundPath`, that path is used instead.
+On Windows, built-in playback works best with `.wav` or `.mp3` files and does not fall back to a console beep.
 
 ### Example custom command
 
