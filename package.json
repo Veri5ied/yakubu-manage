@@ -3,7 +3,7 @@
   "displayName": "Yakubu Manage",
   "description": "Play your Yakubu Manage sound when code diagnostics or terminal commands fail.",
   "version": "0.0.2",
-  "publisher": "yakubu",
+  "publisher": "alvin-okoro",
   "license": "MIT",
   "engines": {
     "vscode": "^1.90.0"
